@@ -6,8 +6,12 @@ using Microsoft.AspNetCore.Builder;
 using System.Text.Json;
 using System.Xml.Linq;
 using static WebApplication3.Controllers.SellerController;
-using System;
 using System.Runtime.InteropServices;
+using System.Reflection;
+using System;
+using System.Diagnostics;
+using System.IO;
+
 namespace WebApplication3.Controllers
 {
     [Route("api/[controller]")]
@@ -119,6 +123,69 @@ namespace WebApplication3.Controllers
                 Console.WriteLine(ex.Message);
                 return StatusCode(200);
             }
+        }
+        [HttpPost("testPathWay")]
+        [Consumes("application/json")]
+        /*
+        1.这个函数展示了c#中常用的路径相关的函数以及路径表示知识
+
+           C:\Documents\Newsletters\Summer2018.pdf	            C: 驱动器的根目录中的绝对文件路径。
+            \Program Files\Custom Utilities\StringFinder.exe	当前驱动器根路径上的相对路径。
+            2018\January.xlsx	                                指向当前目录的子目录中的文件的相对路径。
+            ..\Publications\TravelBrochure.pdf	                指向从当前目录开始的目录中的文件的相对路径。
+            C:\Projects\apilibrary\apilibrary.sln	            C: 驱动器的根目录中的文件的绝对路径。
+            C:Projects\apilibrary\apilibrary.sln	            C: 驱动器的当前目录中的相对路径，建议不要使用
+         
+        2.需要注意@的用法：在c#中会将\作为转义符，所以无法直接表示路径，可以使用\\或者使用@+\来表示，如下：
+          同时$也是好用的
+          "C:\\User\\Administor\\pictures" 或者@"C:\User\Administor\pictures",二者同含义，@的含义是表示后面的\不做转义符
+         
+        3.一些可用的函数
+          Environment.CurrentDirectory 返回当前的工作路径
+          Directory.SetCurrentDirectory("d:\\pictures"); 设置当前的工作路径
+          var path = Path.GetFullPath(".\\wwwroot");设置当前的完整路径
+          
+        4.使用
+          如果需要表示相对工作路径的话就用".\\wwwroot"
+          如果仅仅使用"\\wwwroot"则会在前自动加上D: 根路径还是D:
+          
+         */
+        public IActionResult testPathWay()
+        {
+            Console.WriteLine($"当前当前的工作路径{Environment.CurrentDirectory}");
+            //当前的工作路径
+
+            var path = Path.GetFullPath(".\\wwwroot");
+            //使用相对工作路径下的相对路径
+            Console.WriteLine($"使用相对工作路径下的相对路径{path}");
+
+            path = Path.GetFullPath("..\\wwwroot");
+            //使用相对工作路径下的父路径
+            Console.WriteLine($"使用相对工作路径下的父路径{path}");
+
+            path = Path.GetFullPath("\\wwwroot");
+            //使用相对根路径下的路径
+            Console.WriteLine($"使用相对根路径下的路径{path}");
+
+           
+            Directory.SetCurrentDirectory("d:\\pictures");
+            //需要注意运行时该路径存在
+            Console.WriteLine($"重新设置之后当前的工作路径{Environment.CurrentDirectory}");
+            //当前的工作路径
+
+            path = Path.GetFullPath(".\\wwwroot");
+            //使用相对工作路径下的相对路径
+            Console.WriteLine($"使用相对工作路径下的相对路径{path}");
+
+            path = Path.GetFullPath("..\\wwwroot");
+            //使用相对工作路径下的父路径
+            Console.WriteLine($"使用相对工作路径下的父路径{path}");
+
+            path = Path.GetFullPath("\\wwwroot");
+            //使用相对根路径下的路径
+            Console.WriteLine($"使用相对根路径下的路径{path}");
+
+            return Ok();    
         }
         public class nameModel
         {

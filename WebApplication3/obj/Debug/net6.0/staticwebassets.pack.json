@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\文档\\GitHub\\ASP.NET-Core\\WebApplication3\\wwwroot\\commodityImage\\testPicture.jpg",
+      "PackagePath": "staticwebassets\\commodityImage\\testPicture.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.WebApplication3.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.build.WebApplication3.props",
+      "PackagePath": "build\\WebApplication3.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildMultiTargeting.WebApplication3.props",
+      "PackagePath": "buildMultiTargeting\\WebApplication3.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildTransitive.WebApplication3.props",
+      "PackagePath": "buildTransitive\\WebApplication3.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

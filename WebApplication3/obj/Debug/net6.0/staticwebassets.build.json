@@ -1,11 +1,37 @@
 {
   "Version": 1,
-  "Hash": "lxxWjBYTu+nd/0JoSdB8Tqid45WMOmd4UTMyObbzm7A=",
+  "Hash": "86IGgP9ZOP3wx8mVqzNFLS9LyiXwcFLerB8CkF/Ba7g=",
   "Source": "WebApplication3",
   "BasePath": "_content/WebApplication3",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "WebApplication3\\wwwroot",
+      "Source": "WebApplication3",
+      "ContentRoot": "D:\\文档\\GitHub\\ASP.NET-Core\\WebApplication3\\wwwroot\\",
+      "BasePath": "_content/WebApplication3",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "D:\\文档\\GitHub\\ASP.NET-Core\\WebApplication3\\wwwroot\\commodityImage\\testPicture.jpg",
+      "SourceId": "WebApplication3",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\文档\\GitHub\\ASP.NET-Core\\WebApplication3\\wwwroot\\",
+      "BasePath": "_content/WebApplication3",
+      "RelativePath": "commodityImage/testPicture.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\commodityImage\\testPicture.jpg"
+    }
+  ]
 }

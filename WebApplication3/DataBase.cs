@@ -13,9 +13,12 @@ using System.Text.Json;
 using WebApplication1.Controllers;
 using static WebApplication3.Controllers.SellerController;
 using static WebApplication3.Controllers.TestController;
+using static WebApplication3.Controllers.SearchController;
 using System.Security.Cryptography;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
+using WebApplication3.Controllers;
+using Microsoft.VisualBasic;
 
 namespace WebApplication3
 {
@@ -250,6 +253,104 @@ namespace WebApplication3
 
             return list;
         }
-        
+        public List<CommodityListModel> searchCommodityByName(string searchName,int sortType)
+        {
+            DateTime date = DateTime.Now;
+            Console.WriteLine($"current time =>{date}");
+            var list = new List<CommodityListModel>();
+            var searchSql =
+                $"SELECT " +
+                //$" COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,STO_ID,STO_NAME" +
+                $" COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME" +
+                $" FROM COMMODITY,STORE" +
+                $" WHERE COM_NAME LIKE '%{searchName}%' AND COMMODITY.STO_ID=STORE.STO_ID" +
+                $" ORDER BY COM_RATING DESC";
+            Console.WriteLine("In searchCommodityByName function going to execute: " + searchSql+"\n");
+            using (var cmd = con.CreateCommand())
+            {
+                try
+                {
+                    cmd.CommandText = searchSql;
+                    OracleDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var searchModel = new CommodityListModel();
+                        searchModel.com_id = reader.GetInt32(0);
+                        searchModel.com_name = reader.GetString(1);
+                        searchModel.com_introduction = reader.GetString(2);
+                        searchModel.com_oriPrice = reader.GetDouble(3);
+                        searchModel.com_expirationDate = reader.GetDateTime(4).ToString("yyyy-MM-dd");
+                        searchModel.com_uploadDate = reader.GetDateTime(5).ToString("yyyy-MM-dd");
+                        searchModel.com_left = reader.GetInt32(6);
+                        searchModel.com_rating = reader.GetDouble(7);
+                        searchModel.sto_id = reader.GetDouble(8);
+                        searchModel.sto_name = reader.GetString(9);
+                        using (var cmdFitCategory = con.CreateCommand())
+                        {                     
+                            var fitCategorySql = $"SELECT COM_CATEGORY FROM COMMODITY_CATEGORIES WHERE COM_ID = {searchModel.com_id}";
+                            cmdFitCategory.CommandText = fitCategorySql;
+                            Console.WriteLine("In searchCommodityByName function going to execute: " + fitCategorySql);
+                            OracleDataReader readerFitCategory = cmdFitCategory.ExecuteReader();
+                           
+                            while (readerFitCategory.Read())
+                            {
+                                searchModel.com_categories.Add(readerFitCategory.GetString(0));
+                            }
+                            readerFitCategory.Dispose();
+                            Console.WriteLine("finish fitCategorySql");
+                        }
+                        using (var cmdFitFirImage = con.CreateCommand())
+                        {
+                            var fitFirImageSql = $"SELECT * FROM COMMODITY_IMAGE WHERE COM_ID={searchModel.com_id} ORDER BY COM_ID DESC ";
+                            Console.WriteLine("In searchCommodityByName function going to execute: " + fitFirImageSql);
+                            cmdFitFirImage.CommandText = fitFirImageSql;
+                            OracleDataReader readerFitFirImage = cmdFitFirImage.ExecuteReader();
+                            readerFitFirImage.Read();
+                            searchModel.com_firstImage = readerFitFirImage.GetString(1);
+                           
+                            readerFitFirImage.Dispose();
+                            Console.WriteLine("finish FitFirImageSql");
+                        }
+                        using (var cmdFitPrice = con.CreateCommand())
+                        {
+                            var fitPriceSql = $"SELECT * FROM COMMODITY_PRICE_CURVE WHERE COM_ID ={searchModel.com_id} ORDER BY COM_PC_TIME ASC";
+                            cmdFitPrice.CommandText = fitPriceSql;
+                            Console.WriteLine("In searchCommodityByName function going to execute: " + fitPriceSql);
+                            OracleDataReader readerFitPrice = cmdFitPrice.ExecuteReader();       
+                            double subPrice = -1;
+                            while (readerFitPrice.Read())
+                            {
+                               
+                                if (readerFitPrice.GetDateTime(1) <= date)
+                                {                                   
+                                    subPrice = readerFitPrice.GetDouble(2);                                 
+                                }
+                                else {
+                                  
+                                    searchModel.com_price = subPrice;
+                                    Console.WriteLine($"{searchModel.com_name}找到了现有价格{searchModel.com_price}");
+                                  
+                                    break;                     
+                                }                             
+                               
+                            }
+                            readerFitPrice.Dispose();
+                            if (searchModel.com_price == -1)
+                                Console.WriteLine($"未找到现有价格\n");
+                            readerFitPrice.Dispose();
+                            Console.WriteLine("finish fitPriceSql\n");
+                        }
+                        list.Add(searchModel);
+                    }
+                    reader.Dispose();
+                }
+                catch(Exception ex) { 
+                    Console.WriteLine("In searchCommodityByName function erorr \n"); 
+                    Console.WriteLine(ex.Message); }
+            }
+            return list;
+        }
+
+
     }
 }
