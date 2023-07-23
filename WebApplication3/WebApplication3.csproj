@@ -24,6 +24,8 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\commodityImage\" />
+    <Folder Include="wwwroot\storeImage\" />
+    <Folder Include="wwwroot\storeLicenseImg\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
