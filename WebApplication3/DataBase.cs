@@ -26,8 +26,8 @@ namespace WebApplication3
     public class DataBase
     { 
        // private string connectString = @"DATA SOURCE=localhost:1521/orcl;TNS_ADMIN=C:\Users\Administrator\Oracle\network\admin;PERSIST SECURITY INFO=True;USER ID=WGY;Password=123456";
-        private string connectString = @"DATA SOURCE=124.70.7.210:1521/orcl;TNS_ADMIN=C:\Users\Administrator\Oracle\network\admin;PERSIST SECURITY INFO=True;USER ID=WGY;Password=123456";
-        //private string connectString ="User Id=" + "system" + ";Password=" + "wy200286" + ";Data Source=" +"localhost:1521/orcl" + ";";
+       // private string connectString = @"DATA SOURCE=124.70.7.210:1521/orcl;TNS_ADMIN=C:\Users\Administrator\Oracle\network\admin;PERSIST SECURITY INFO=True;USER ID=WGY;Password=123456";
+        private string connectString ="User Id=" + "system" + ";Password=" + "wy200286" + ";Data Source=" +"localhost:1521/orcl" + ";";
         OracleConnection con;
         public static DataBase oracleCon;
         public DataBase()
@@ -523,8 +523,10 @@ namespace WebApplication3
                             cmdFitCom.CommandText = fitComSql;
                             Console.WriteLine("In searchCommodityByName function going to execute: " + fitComSql);
                             OracleDataReader readerFitCom = cmdFitCom.ExecuteReader();
-                            while (readerFitCom.Read())
+                            int count = 0;
+                            while (readerFitCom.Read()&&count<3)
                             {
+
                                 var subCom = new SubCommodityListModel();
                                 subCom.com_name = readerFitCom.GetString(1);
                                 subCom.com_expirationDate = readerFitCom.GetDateTime(2).ToString("yyyy-MM-dd");
@@ -569,6 +571,7 @@ namespace WebApplication3
                                     Console.WriteLine("finish FitFirImageSql");
                                 }
                                 searchModel.com_list.Add(subCom);
+                                count++;
                             }
                         }
                         
