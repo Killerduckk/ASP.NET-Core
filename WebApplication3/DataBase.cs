@@ -15,6 +15,7 @@ using static WebApplication3.Controllers.SellerController;
 using static WebApplication3.Controllers.TestController;
 using static WebApplication3.Controllers.SearchController;
 using static WebApplication3.Controllers.CommodityController;
+using static WebApplication3.Controllers.StoreController;
 using System.Security.Cryptography;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
@@ -427,7 +428,8 @@ namespace WebApplication3
                             {
                                 var singlePriceNode = new PriceCurveModel();
                                 singlePriceNode.com_pc_price=readerFitPrice.GetDouble(2);
-                                singlePriceNode.com_pc_time = readerFitPrice.GetDateTime(1).ToString("yyyy-mm-dd");
+                                singlePriceNode.com_pc_time = readerFitPrice.GetDateTime(1).ToString("yyyy-MM-dd");
+                                Console.WriteLine(readerFitPrice.GetDateTime(1).ToString("yyyy-MM-DD"));
                                 searchModel.com_prices.Add(singlePriceNode);
                                 if (readerFitPrice.GetDateTime(1) <= date &&!findCurrPrice)
                                 {
