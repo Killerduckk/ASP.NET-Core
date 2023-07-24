@@ -8,15 +8,15 @@
 注：截至2023/7/24/12:00 实验数据库中可供搜索的商品关键词仅包含“bread” ,商品ID“5，6，7”，商家ID“111，123”，商家名称“张三水果店，李四面包店”
 注：本次项目在wwwroot路径下有三个文件夹：
 
-![Alt text](image-8.png)
+![Alt text](.\\img\\image-8.png)
 
 分别用于存储商品图片，商家图片，商家执照图片
 
-![Alt text](image-9.png)
+![Alt text](.\\img\\image-9.png)
 
 数据库中仅存文件名：
 
-![Alt text](image-10.png)
+![Alt text](.\\img\\image-10.png)
 # 功能点展示
 ## 功能点1
 ### 输入输出
@@ -34,7 +34,7 @@
 
 1.输入
 
-![Alt text](image.png)
+![Alt text](.\\img\\image.png)
 
 2.输出(将apiFox用例中结果复制粘贴如下)
 
@@ -102,7 +102,7 @@
 
 
 1.输入
-![Alt text](image.png)
+![Alt text](.\\img\\image.png)
 
 
 2.输出(将apiFox用例中结果复制粘贴如下)
@@ -128,7 +128,7 @@
 #### 搜索“张三”
 1.输入
 
-![Alt text](image-1.png)
+![Alt text](.\\img\\image-1.png)
 
 2.输出
 
@@ -169,7 +169,7 @@
 
 1.输入
 
-![Alt text](image-3.png)
+![Alt text](.\\img\\image-3.png)
 
 2.输出
 
@@ -241,7 +241,7 @@
 
 1.输入
 
-![Alt text](image-4.png)
+![Alt text](.\\img\\image-4.png)
 
 2.输出
 
@@ -290,7 +290,7 @@
 
 1.输入
 
-![Alt text](image-5.png)
+![Alt text](.\\img\\image-5.png)
 
 2.输出
 
@@ -329,7 +329,7 @@
 #### 搜索 sto_id=111
 
 1.输入
-![Alt text](image-6.png)
+![Alt text](.\\img\\image-6.png)
 2.输出
 
 ```
@@ -368,7 +368,7 @@
 
 #### 搜索不存在商家
 1.输入
-![Alt text](image-7.png)
+![Alt text](.\\img\\image-7.png)
 2.输出
 ```
 {
