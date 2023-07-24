@@ -1015,9 +1015,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\文档\\GitHub\\ASP.NET-Core\\WebApplication3\\WebApplication3.csproj",
-      "projectName": "WebApplication3",
-      "projectPath": "D:\\文档\\GitHub\\ASP.NET-Core\\WebApplication3\\WebApplication3.csproj",
+      "projectUniqueName": "D:\\文档\\GitHub\\ASP.NET-Core\\WebApplication3\\临期食品.csproj",
+      "projectName": "临期食品",
+      "projectPath": "D:\\文档\\GitHub\\ASP.NET-Core\\WebApplication3\\临期食品.csproj",
       "packagesPath": "C:\\Users\\wgy66\\.nuget\\packages\\",
       "outputPath": "D:\\文档\\GitHub\\ASP.NET-Core\\WebApplication3\\obj\\",
       "projectStyle": "PackageReference",

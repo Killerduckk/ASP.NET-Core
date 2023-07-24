@@ -26,8 +26,8 @@ namespace WebApplication3
     public class DataBase
     { 
        // private string connectString = @"DATA SOURCE=localhost:1521/orcl;TNS_ADMIN=C:\Users\Administrator\Oracle\network\admin;PERSIST SECURITY INFO=True;USER ID=WGY;Password=123456";
-        //private string connectString = @"DATA SOURCE=124.70.7.210:1521/orcl;TNS_ADMIN=C:\Users\Administrator\Oracle\network\admin;PERSIST SECURITY INFO=True;USER ID=WGY;Password=123456";
-        private string connectString ="User Id=" + "system" + ";Password=" + "wy200286" + ";Data Source=" +"localhost:1521/orcl" + ";";
+        private string connectString = @"DATA SOURCE=124.70.7.210:1521/orcl;TNS_ADMIN=C:\Users\Administrator\Oracle\network\admin;PERSIST SECURITY INFO=True;USER ID=WGY;Password=123456";
+        //private string connectString ="User Id=" + "system" + ";Password=" + "wy200286" + ";Data Source=" +"localhost:1521/orcl" + ";";
         OracleConnection con;
         public static DataBase oracleCon;
         public DataBase()
@@ -364,7 +364,7 @@ namespace WebApplication3
                 $"SELECT " +
                 $" COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME" +
                 $" FROM COMMODITY, STORE" +
-                $" WHERE COM_ID ={com_id}";          
+                $" WHERE COM_ID ={com_id} AND COMMODITY.STO_ID=STORE.STO_ID";          
             Console.WriteLine("In searchCommodityByName function going to execute: " + searchSql + "\n");
             var searchModel = new CommodityDetailModel();
             using (var cmd = con.CreateCommand())
@@ -375,7 +375,7 @@ namespace WebApplication3
                     OracleDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-                    
+                        Console.Write($"{reader.ToString()}");
                         searchModel.com_id = reader.GetInt32(0);
                         searchModel.com_name = reader.GetString(1);
                         searchModel.com_introduction = reader.GetString(2);
@@ -449,6 +449,7 @@ namespace WebApplication3
                             readerFitPrice.Dispose();
                             Console.WriteLine("finish fitPriceSql\n");
                         }
+                        //break;
              
                     }
                     reader.Dispose();
