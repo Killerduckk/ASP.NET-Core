@@ -14,7 +14,7 @@ namespace WebApplication3.Controllers
         {
             try {
                 Console.WriteLine("Get into  GetCommodityDetail function");
-                return StatusCode(200, (DataBase.oracleCon.sqlSearchCommodityByID(com_id))); 
+                return StatusCode(200, (DataBase.oracleCon.sqlSearchCommodityByID(com_id,12))); 
             }
             catch (Exception ex) {
                 Console.WriteLine(ex);

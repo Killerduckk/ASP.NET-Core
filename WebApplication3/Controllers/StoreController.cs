@@ -17,7 +17,7 @@ namespace WebApplication3.Controllers
             {
                 int data = sto_id;
                 Console.WriteLine("Get into  GetStoreDetail function");
-                return StatusCode(200, (DataBase.oracleCon.sqlSearchStoreByID(data)));
+                return StatusCode(200, (DataBase.oracleCon.sqlSearchStoreByID(data, 12)));
             }
             catch (Exception ex)
             {

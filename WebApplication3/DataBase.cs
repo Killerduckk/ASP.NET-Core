@@ -18,6 +18,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using WebApplication3.Controllers;
 using Microsoft.VisualBasic;
+using System.Reflection;
 
 namespace WebApplication3
 {
@@ -109,12 +110,23 @@ namespace WebApplication3
             Console.WriteLine($"current time =>{date}");
             var list = new List<CommodityListModel>();
             var searchSql =
-                $"SELECT " +
+                $"WITH FAVOR_COM_ID AS (" +
+                $" SELECT COMMODITY_CATEGORIES.COM_ID AS SUB_ID" +
+                $" FROM COMMODITY_CATEGORIES" +
+                $" WHERE " +
+                $" INSTR('{searchName}', COMMODITY_CATEGORIES.COM_CATEGORY) > 0)" +
+                $" SELECT " +
                 $" COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME" +
-                $" FROM COMMODITY,STORE" +
-                $" WHERE COM_NAME LIKE '%{searchName}%' AND COMMODITY.STO_ID=STORE.STO_ID" +
+                $" FROM COMMODITY" +
+                $" JOIN STORE ON COMMODITY.STO_ID=STORE.STO_ID" +
+                $" WHERE COM_NAME LIKE '%{searchName}%'" +
+                $" UNION " +
+                $" SELECT COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME" +
+                $" FROM COMMODITY" +
+                $" JOIN STORE ON COMMODITY.STO_ID=STORE.STO_ID" +
+                $" JOIN FAVOR_COM_ID ON COMMODITY.COM_ID=FAVOR_COM_ID.SUB_ID" +
                 $" ORDER BY COM_RATING DESC";
-            Console.WriteLine("In searchCommodityByName function going to execute: " + searchSql+"\n");
+            Console.WriteLine("In searchCommodityByName function going to execute: " + searchSql + "\n");
             //搜索商品
             using (var cmd = con.CreateCommand())
             {
@@ -159,14 +171,14 @@ namespace WebApplication3
                             Console.WriteLine("In searchCommodityByName function going to execute: " + fitFirImageSql);
                             cmdFitFirImage.CommandText = fitFirImageSql;
                             OracleDataReader readerFitFirImage = cmdFitFirImage.ExecuteReader();
-                            while (readerFitFirImage.Read())
+                            if (readerFitFirImage.HasRows)
                             {
+                                readerFitFirImage.Read();
                                 searchModel.com_firstImage = readerFitFirImage.GetString(1);
-                                break;
+                                readerFitFirImage.Dispose();
+                                Console.WriteLine("finish FitFirImageSql");
                             }
-                           
-                            readerFitFirImage.Dispose();
-                            Console.WriteLine("finish FitFirImageSql");
+                            else { Console.WriteLine($"The commodity with id={searchModel.com_id} has no image"); }
                         }
 
                         //搜索固定某个商品现在价格
@@ -268,14 +280,14 @@ namespace WebApplication3
                             Console.WriteLine("In searchCommodityByName function going to execute: " + fitFirImageSql);
                             cmdFitFirImage.CommandText = fitFirImageSql;
                             OracleDataReader readerFitFirImage = cmdFitFirImage.ExecuteReader();
-                            while (readerFitFirImage.Read())
+                            if (readerFitFirImage.HasRows)
                             {
+                                readerFitFirImage.Read();
                                 searchModel.com_firstImage = readerFitFirImage.GetString(1);
-                                break;
+                                readerFitFirImage.Dispose();
+                                Console.WriteLine("finish FitFirImageSql");
                             }
-
-                            readerFitFirImage.Dispose();
-                            Console.WriteLine("finish FitFirImageSql");
+                            else { Console.WriteLine($"The commodity with id={searchModel.com_id} has no image"); }
                         }
 
                         //搜索固定某个商品现在价格
@@ -289,6 +301,7 @@ namespace WebApplication3
                             double subPrice = -1;
                             while (readerFitPrice.Read())
                             {
+                                
                                 //如果data比所有的readerFitPrice.GetDateTime(1)都大的，现实意义上是过期了，这里无法给其进行赋值
                                 if (readerFitPrice.GetDateTime(1) <= date)
                                 {
@@ -326,7 +339,7 @@ namespace WebApplication3
 
 
         /*按照商品的ID搜索商品*/
-        public CommodityDetailModel sqlSearchCommodityByID(int com_id)
+        public CommodityDetailModel sqlSearchCommodityByID(int com_id,int cus_id)
         {
             Console.WriteLine("Get into function searchCommodityByID \n");
             DateTime date = DateTime.Now;          
@@ -396,21 +409,21 @@ namespace WebApplication3
                             while (readerFitPrice.Read())
                             {
                                 var singlePriceNode = new PriceCurveModel();
-                                singlePriceNode.com_pc_price=readerFitPrice.GetDouble(2);
+                                singlePriceNode.com_pc_price = readerFitPrice.GetDouble(2);
                                 singlePriceNode.com_pc_time = readerFitPrice.GetDateTime(1).ToString("yyyy-MM-dd");
                                 Console.WriteLine(readerFitPrice.GetDateTime(1).ToString("yyyy-MM-DD"));
                                 searchModel.com_prices.Add(singlePriceNode);
-                                if (readerFitPrice.GetDateTime(1) <= date &&!findCurrPrice)
+                                if (readerFitPrice.GetDateTime(1) <= date && !findCurrPrice)
                                 {
                                     subPrice = readerFitPrice.GetDouble(2);
                                 }
-                                else if(readerFitPrice.GetDateTime(1) >date && !findCurrPrice)
+                                else if (readerFitPrice.GetDateTime(1) > date && !findCurrPrice)
                                 {
 
                                     searchModel.com_price = subPrice;
                                     Console.WriteLine($"{searchModel.com_name}找到了现有价格{searchModel.com_price}");
                                     findCurrPrice = true;
-                                    
+
                                 }
 
                             }
@@ -420,9 +433,23 @@ namespace WebApplication3
                             readerFitPrice.Dispose();
                             Console.WriteLine("finish fitPriceSql\n");
                         }
-                        //break;
-             
-                    }
+                        using (var cmdFitFavor = con.CreateCommand())
+                        {
+                            var sqlQuery = $"SELECT * FROM FAVORITE WHERE COM_ID = {searchModel.com_id} AND CUS_ID ={cus_id}";
+                            cmd.CommandText = sqlQuery;//sqlList[0]为插入语句，sqlList[1]为删除语句
+                            reader= cmd.ExecuteReader();
+                            if (reader.HasRows)
+                            {
+                                searchModel.favor_state = 1;
+                            }
+                            else
+                            {
+                                searchModel.favor_state = 0;
+                            }                            
+
+                        }
+                               
+                        }
                     reader.Dispose();
                 }
                 catch (Exception ex)
@@ -467,7 +494,7 @@ namespace WebApplication3
                         {
                             var fitCategorySql = $"SELECT COM_CATEGORY FROM STORE_CATEGORIES WHERE STORE_ID = {searchModel.sto_id}";
                             cmdFitCategory.CommandText = fitCategorySql;
-                            Console.WriteLine("In searchCommodityByName function going to execute: " + fitCategorySql);
+                            Console.WriteLine("In 'searchStoreByName' function going to execute: " + fitCategorySql);
                             OracleDataReader readerFitCategory = cmdFitCategory.ExecuteReader();
 
                             while (readerFitCategory.Read())
@@ -480,10 +507,10 @@ namespace WebApplication3
                         using (var cmdFitFirImage = con.CreateCommand())
                         {
                             var fitFirImageSql = $"SELECT * FROM STOREIMAGE WHERE STO_ID={searchModel.sto_id} ";
-                            Console.WriteLine("In searchCommodityByName function going to execute: " + fitFirImageSql);
+                            Console.WriteLine("In 'searchStoreByName' function going to execute: " + fitFirImageSql);
                             cmdFitFirImage.CommandText = fitFirImageSql;
                             OracleDataReader readerFitFirImage = cmdFitFirImage.ExecuteReader();
-                            while (readerFitFirImage.Read()) {
+                            while(readerFitFirImage.Read()) {
                                 searchModel.sto_firstImage = readerFitFirImage.GetString(1);
                                 break;
                             }
@@ -495,13 +522,14 @@ namespace WebApplication3
                         {
                             var fitComSql = $"SELECT COM_ID,COM_NAME,COM_EXPIRATIONDATE FROM COMMODITY WHERE STO_ID ={searchModel.sto_id} ORDER BY COM_RATING";
                             cmdFitCom.CommandText = fitComSql;
-                            Console.WriteLine("In searchCommodityByName function going to execute: " + fitComSql);
+                            Console.WriteLine("In 'searchStoreByName' function going to execute: " + fitComSql);
                             OracleDataReader readerFitCom = cmdFitCom.ExecuteReader();
                             int count = 0;
                             while (readerFitCom.Read()&&count<3)
                             {
 
                                 var subCom = new SubCommodityListModel();
+                                subCom.com_id =readerFitCom.GetInt32(0); ;
                                 subCom.com_name = readerFitCom.GetString(1);
                                 subCom.com_expirationDate = readerFitCom.GetDateTime(2).ToString("yyyy-MM-dd");
                                 int my_com_id = readerFitCom.GetInt32(0); ;
@@ -509,7 +537,7 @@ namespace WebApplication3
                                 {
                                     var fitPriceSql = $"SELECT * FROM COMMODITY_PRICE_CURVE WHERE COM_ID ={my_com_id} ORDER BY COM_PC_TIME ASC";
                                     cmdFitPrice.CommandText = fitPriceSql;
-                                    Console.WriteLine("In searchCommodityByName function going to execute: " + fitPriceSql);
+                                    Console.WriteLine("In 'searchStoreByName' function going to execute: " + fitPriceSql);
                                     OracleDataReader readerFitPrice = cmdFitPrice.ExecuteReader();
                                     double subPrice = -1;
                                     while (readerFitPrice.Read())
@@ -532,23 +560,28 @@ namespace WebApplication3
                                     readerFitPrice.Dispose();
                                     Console.WriteLine("finish fitPriceSql\n");
                                 }
-
                                 using (var cmdFitFirImage = con.CreateCommand())
                                 {
                                     var fitFirImageSql = $"SELECT * FROM COMMODITY_IMAGE WHERE COM_ID={my_com_id} ";
-                                    Console.WriteLine("In searchCommodityByName function going to execute: " + fitFirImageSql);
+                                    Console.WriteLine("In 'searchStoreByName' function going to execute: " + fitFirImageSql);
                                     cmdFitFirImage.CommandText = fitFirImageSql;
                                     OracleDataReader readerFitFirImage = cmdFitFirImage.ExecuteReader();
-                                    readerFitFirImage.Read();
-                                    subCom.com_firstImage = readerFitFirImage.GetString(1);
-                                    readerFitFirImage.Dispose();
-                                    Console.WriteLine("finish FitFirImageSql");
+                                    if(readerFitFirImage.HasRows)
+                                    {
+                                        readerFitFirImage.Read();
+                                        subCom.com_firstImage = readerFitFirImage.GetString(1);
+                                        readerFitFirImage.Dispose();
+                                        Console.WriteLine("finish FitFirImageSql");
+                                    }
+                                    else { Console.WriteLine($"The commodity with id={my_com_id} has no image"); }
+                                   
                                 }
+                                
                                 searchModel.com_list.Add(subCom);
                                 count++;
                             }
                         }
-                        
+                       
                         list.Add(searchModel);
                     }
                     reader.Dispose();
@@ -566,7 +599,7 @@ namespace WebApplication3
 
 
         //按照商家ID搜索特定的商家，返回这个商家的基本信息和每个商家旗下三款商品的基本信息，用于商家详情页面
-        public StoreDetailModel sqlSearchStoreByID(int sto_id)
+        public StoreDetailModel sqlSearchStoreByID(int sto_id,int cus_id)
         {
 
             Console.WriteLine("Get tnto searchStoreByID function ");
@@ -633,6 +666,7 @@ namespace WebApplication3
                             while (readerFitCom.Read())
                             {
                                 var subCom = new SubCommodityListModel();
+                                subCom.com_id=readerFitCom.GetInt32(0);
                                 subCom.com_name = readerFitCom.GetString(1);
                                 subCom.com_expirationDate = readerFitCom.GetDateTime(2).ToString("yyyy-MM-dd");
                                 int my_com_id = readerFitCom.GetInt32(0); ;
@@ -671,10 +705,29 @@ namespace WebApplication3
                                     Console.WriteLine("In searchCommodityByName function going to execute: " + fitFirImageSql);
                                     cmdFitFirImage.CommandText = fitFirImageSql;
                                     OracleDataReader readerFitFirImage = cmdFitFirImage.ExecuteReader();
-                                    readerFitFirImage.Read();
-                                    subCom.com_firstImage = readerFitFirImage.GetString(1);
-                                    readerFitFirImage.Dispose();
-                                    Console.WriteLine("finish FitFirImageSql");
+                                    if (readerFitFirImage.HasRows)
+                                    {
+                                        readerFitFirImage.Read();
+                                        subCom.com_firstImage = readerFitFirImage.GetString(1);
+                                        readerFitFirImage.Dispose();
+                                        Console.WriteLine("finish FitFirImageSql");
+                                    }
+                                    else { Console.WriteLine($"The commodity with id={my_com_id} has no image"); }
+                                }
+                                using (var cmdFitFavor = con.CreateCommand())
+                                {
+                                    var sqlQuery = $"SELECT * FROM FAVORITE WHERE COM_ID = {subCom.com_id} AND CUS_ID ={cus_id}";
+                                    cmd.CommandText = sqlQuery;//sqlList[0]为插入语句，sqlList[1]为删除语句
+                                    reader = cmd.ExecuteReader();
+                                    if (reader.HasRows)
+                                    {
+                                        subCom.favor_state = 1;
+                                    }
+                                    else
+                                    {
+                                        subCom.favor_state = 0;
+                                    }
+
                                 }
                                 searchModel.com_list.Add(subCom);
                             }
@@ -698,13 +751,6 @@ namespace WebApplication3
             int sqlFlag = 1;//如果为0则执行插入语句，如果为1则执行执行删除语句
             using (var cmd = con.CreateCommand())
             {
-                /*在.NET框架中，ExecuteScalar()方法是System.Data.SqlClient.SqlCommand类的一个方法。它执行查询，并返回查询结果集中第一行的第一列。其余的列或行会被忽视。
-                 * 这个方法特别适合用在只返回一个值的聚合函数，比如COUNT、SUM、AVG、MIN、MAX等
-                 *在你的代码中，ExecuteScalar()方法执行了SQL查询"SELECT COUNT(*) FROM Products WHERE ID = 5"，并返回结果集中第一行的第一列，即记录的数量。然后，这个值被转换为整数类型，并赋值给变量count。
-                 *Convert.ToInt32()是.NET框架中的一个方法，用于将一个值转换为32位整数。在这个情况下，它将ExecuteScalar()方法返回的对象转换为整数。
-                 *如果ExecuteScalar()返回的是DBNull，Convert.ToInt32()将返回0。
-                 * 
-                 */
                 cmd.CommandText = sqlList[2];//sqlList[0]为插入语句，sqlList[1]为删除语句
                 int count = Convert.ToInt32(cmd.ExecuteScalar());
                 if (count!=0)

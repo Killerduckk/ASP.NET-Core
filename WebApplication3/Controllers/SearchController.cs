@@ -92,6 +92,7 @@ namespace WebApplication3.Controllers
         public double com_price { get; set; } = -1;
 
         public int favor_state { get; set; } = 0;
+
         public bool MyIsNull() { return com_id == -1; }
     };
 
@@ -125,11 +126,15 @@ namespace WebApplication3.Controllers
         //需要分离写，不然会重复调用，需要写一个  _变量 来存 变量的值
         //private static int defaultValueCom_Id = -1;
         //日期字符串和日期对象，日期字符串转为日期对象：DateTime.parse(string s)
-        // 日期对象转为日期字符串：date.ToString("yyyy-mm-dd") 
+        // 日期对象转为日期字符串：date.ToString("yyyy-mm-dd")
+
+        public int com_id{ get; set; } = -1;
         public string com_name { get; set; } = "-1";
         public string com_expirationDate { get; set; } = "0000-00-00";
         public string com_firstImage { get; set; } = "-1";
         public double com_price { get; set; } = -1;
+
+        public int favor_state { get; set; } = -1;
 
     };
 
