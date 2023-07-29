@@ -6,6 +6,8 @@ namespace WebApplication3.Controllers
     [ApiController]
     public class StoreController : Controller
     {
+
+        //用于获取商家的详细信息，用于商家详情展示页面
         [HttpGet("detail")]
         [Consumes("application/json")]
         public IActionResult GetStoreDetail(int sto_id)
@@ -15,7 +17,7 @@ namespace WebApplication3.Controllers
             {
                 int data = sto_id;
                 Console.WriteLine("Get into  GetStoreDetail function");
-                return StatusCode(200, (DataBase.oracleCon.searchStoreByID(data)));
+                return StatusCode(200, (DataBase.oracleCon.sqlSearchStoreByID(data)));
             }
             catch (Exception ex)
             {
@@ -45,7 +47,7 @@ namespace WebApplication3.Controllers
 
             public List<string> sto_imageList { get; set; } = new List<string>();
 
-            public List<string> sto_notices { get; set; } = new List<string>();
+            public List<string> sto_notice { get; set; } = new List<string>();
 
             public List<SubCommodityListModel> com_list { get; set; } = new List<SubCommodityListModel>();
 

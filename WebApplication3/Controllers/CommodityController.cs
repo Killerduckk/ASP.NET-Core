@@ -7,13 +7,14 @@ namespace WebApplication3.Controllers
     public class CommodityController : Controller
     {
 
+        //返回商品的详细信息，用于展示商品详情
         [HttpGet("detail")]
         [Consumes("application/json")]
         public IActionResult GetCommodityDetail(int com_id)
         {
             try {
                 Console.WriteLine("Get into  GetCommodityDetail function");
-                return StatusCode(200, (DataBase.oracleCon.searchCommodityByID(com_id))); 
+                return StatusCode(200, (DataBase.oracleCon.sqlSearchCommodityByID(com_id))); 
             }
             catch (Exception ex) {
                 Console.WriteLine(ex);
@@ -21,6 +22,9 @@ namespace WebApplication3.Controllers
             }
             
         }
+
+
+        //返回商品的详情，用于展示商品详情
         public class CommodityDetailModel
         {
             //private string _com_expirationDate = "0000-00-00";
@@ -41,15 +45,14 @@ namespace WebApplication3.Controllers
             public double sto_id { get; set; } = 111;
             public List<string> com_categories { get; set; } = new List<string>();
             //不知是否需要一个数据结构
-
-
-
             public List<string> com_images { get; set; } = new List<string>();
 
             public  double com_price { get; set; }
             public List<PriceCurveModel> com_prices { get; set; } = new List<PriceCurveModel>();
 
             public List<string> comments { get; set; } =new List<string>();
+
+            public int favor_state { get; set; } = 0;
 
             public bool MyIsNull() { return com_id == -1; }
         };
