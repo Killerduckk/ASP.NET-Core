@@ -46,8 +46,9 @@ namespace WebApplication3.Controllers
 
         [HttpGet("getFavor")]
         [Consumes("application/json")]
-        public IActionResult GetFavorCommodity([FromBody] StateModel model)
+        public IActionResult GetFavorCommodity([FromQuery] StateModel model)
         {
+            Console.WriteLine(model.cus_id);
 
             try
             {

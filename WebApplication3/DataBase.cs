@@ -104,7 +104,7 @@ namespace WebApplication3
 
 
         /*根据输入的字符串对商品名称进行模糊匹配，返回搜索到的一组商品详情*/
-        public List<CommodityListModel> sqlSearchCommodityByName(string searchName,int sortType)
+        public List<CommodityListModel> sqlSearchCommodityByName(string searchName,int sortType,int cus_id)
         {       
             DateTime date = DateTime.Now;
             Console.WriteLine($"current time =>{date}");
@@ -180,7 +180,21 @@ namespace WebApplication3
                             }
                             else { Console.WriteLine($"The commodity with id={searchModel.com_id} has no image"); }
                         }
+                        using (var cmdFitFavor = con.CreateCommand())
+                        {
+                            var sqlQuery = $"SELECT * FROM FAVORITE WHERE COM_ID = {searchModel.com_id} AND CUS_ID ={cus_id}";
+                            cmdFitFavor.CommandText = sqlQuery;
+                            var fitFavorReader = cmdFitFavor.ExecuteReader();
+                            if (fitFavorReader.HasRows)
+                            {
+                                searchModel.favor_state = 1;
+                            }
+                            else
+                            {
+                                searchModel.favor_state = 0;
+                            }
 
+                        }
                         //搜索固定某个商品现在价格
                         using (var cmdFitPrice = con.CreateCommand())
                         {
@@ -188,7 +202,8 @@ namespace WebApplication3
                             cmdFitPrice.CommandText = fitPriceSql;
                             Console.WriteLine("In searchCommodityByName function going to execute: " + fitPriceSql);
                             OracleDataReader readerFitPrice = cmdFitPrice.ExecuteReader();       
-                            double subPrice = -1;
+                            double subPrice = 0;
+                            //记住，数据库处理的时候需要
                             while (readerFitPrice.Read())
                             {
                                
@@ -205,9 +220,6 @@ namespace WebApplication3
                                 }                             
                                
                             }
-                            readerFitPrice.Dispose();
-                            if (searchModel.com_price == -1)
-                                Console.WriteLine($"未找到现有价格\n");
                             readerFitPrice.Dispose();
                             Console.WriteLine("finish fitPriceSql\n");
                         }
@@ -436,9 +448,9 @@ namespace WebApplication3
                         using (var cmdFitFavor = con.CreateCommand())
                         {
                             var sqlQuery = $"SELECT * FROM FAVORITE WHERE COM_ID = {searchModel.com_id} AND CUS_ID ={cus_id}";
-                            cmd.CommandText = sqlQuery;//sqlList[0]为插入语句，sqlList[1]为删除语句
-                            reader= cmd.ExecuteReader();
-                            if (reader.HasRows)
+                            cmdFitFavor.CommandText = sqlQuery;
+                            var my_reader= cmdFitFavor.ExecuteReader();
+                            if (my_reader.HasRows)
                             {
                                 searchModel.favor_state = 1;
                             }
@@ -449,7 +461,7 @@ namespace WebApplication3
 
                         }
                                
-                        }
+                    }
                     reader.Dispose();
                 }
                 catch (Exception ex)
@@ -657,6 +669,22 @@ namespace WebApplication3
                             readerFitImage.Dispose();
                             Console.WriteLine("finish FitFirImageSql");
                         }
+                        using (var cmdFitNotice = con.CreateCommand())
+                        {
+                            var fitNoticeSql = $"SELECT * FROM  NOTICE WHERE STO_ID={searchModel.sto_id} ORDER BY NTC_TIME DESC ";
+                            Console.WriteLine("In searchCommodityByName function going to execute: " + fitNoticeSql);
+                            cmdFitNotice.CommandText = fitNoticeSql;
+                            OracleDataReader readerFitNotice = cmdFitNotice.ExecuteReader();                   
+                            while (readerFitNotice.Read())
+                            {
+                                var tempNotice=new NoticeModel();
+                                tempNotice.ntc_content = readerFitNotice.GetString(2);
+                                tempNotice.ntc_time= readerFitNotice.GetDateTime(1).ToString("yyyy-MM-dd");
+                                searchModel.sto_notice.Add (tempNotice);
+                            }
+                            readerFitNotice.Dispose();
+                            Console.WriteLine("finish FitFirNoticeSql");
+                        }
                         using (var cmdFitCom = con.CreateCommand())
                         {
                             var fitComSql = $"SELECT COM_ID,COM_NAME,COM_EXPIRATIONDATE FROM COMMODITY WHERE STO_ID ={searchModel.sto_id} ORDER BY COM_RATING";
@@ -717,9 +745,9 @@ namespace WebApplication3
                                 using (var cmdFitFavor = con.CreateCommand())
                                 {
                                     var sqlQuery = $"SELECT * FROM FAVORITE WHERE COM_ID = {subCom.com_id} AND CUS_ID ={cus_id}";
-                                    cmd.CommandText = sqlQuery;//sqlList[0]为插入语句，sqlList[1]为删除语句
-                                    reader = cmd.ExecuteReader();
-                                    if (reader.HasRows)
+                                    cmdFitFavor.CommandText = sqlQuery;//sqlList[0]为插入语句，sqlList[1]为删除语句
+                                    var my_reader = cmdFitFavor.ExecuteReader();
+                                    if (my_reader.HasRows)
                                     {
                                         subCom.favor_state = 1;
                                     }
@@ -727,7 +755,6 @@ namespace WebApplication3
                                     {
                                         subCom.favor_state = 0;
                                     }
-
                                 }
                                 searchModel.com_list.Add(subCom);
                             }

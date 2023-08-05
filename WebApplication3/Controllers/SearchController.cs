@@ -26,7 +26,7 @@ namespace WebApplication3.Controllers
            
             try
             {
-                var list = DataBase.oracleCon.sqlSearchCommodityByName(model.search_str, model.sort_order);
+                var list = DataBase.oracleCon.sqlSearchCommodityByName(model.search_str, model.sort_order,12);
                 return StatusCode(200, new {com_list = list });
             }
             catch (Exception ex)
@@ -89,7 +89,7 @@ namespace WebApplication3.Controllers
         
         public List<string> com_categories { get; set; }= new List<string>();
         public string  com_firstImage { get; set; } = "-1";
-        public double com_price { get; set; } = -1;
+        public double com_price { get; set; } = 0;
 
         public int favor_state { get; set; } = 0;
 
@@ -106,14 +106,11 @@ namespace WebApplication3.Controllers
         public string sto_name { get; set; } = "-1";
         public string sto_introduction { get; set; } = "-1";
       
-      
-
         public List<string> com_categories { get; set; } = new List<string>();
 
         public string user_address { get; set; } = "-1";
         public string sto_firstImage { get; set; } = "-1";
   
-
         public List<SubCommodityListModel> com_list{ get; set; } = new List<SubCommodityListModel>();
 
     };

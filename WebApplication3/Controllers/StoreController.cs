@@ -47,10 +47,20 @@ namespace WebApplication3.Controllers
 
             public List<string> sto_imageList { get; set; } = new List<string>();
 
-            public List<string> sto_notice { get; set; } = new List<string>();
+            public List<NoticeModel> sto_notice { get; set; } = new List<NoticeModel>();
 
             public List<SubCommodityListModel> com_list { get; set; } = new List<SubCommodityListModel>();
+            
+
+            public string notice { get; set; } = "-1";
 
         };
+
+        public class NoticeModel
+        { 
+            public string ntc_time { get; set; }
+
+            public string ntc_content { get; set; }
+        }
     }
 }
