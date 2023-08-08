@@ -26,8 +26,16 @@ namespace WebApplication3.Controllers
            
             try
             {
-                var list = DataBase.oracleCon.sqlSearchCommodityByName(model.search_str, model.sort_order,12);
-                return StatusCode(200, new {com_list = list });
+                var list = DataBase.oracleCon.sqlSearchCommodityByName(model);
+                int len = 0;
+
+                if (list.Count > model.end_pos)
+                    len = model.end_pos - model.begin_pos;
+                else
+                    len = list.Count - model.begin_pos;
+
+                var subList = list.GetRange(model.begin_pos, len);
+                return StatusCode(200, new {com_list = subList, total = list.Count });
             }
             catch (Exception ex)
             {
@@ -46,13 +54,39 @@ namespace WebApplication3.Controllers
 
             try
             {
-                var list = DataBase.oracleCon.sqlSearchStoreByName(model.search_str);
-                return StatusCode(200, new { sto_list = list });
+                var list = DataBase.oracleCon.sqlSearchStoreByName(model);
+                int len = 0;
+
+                if (list.Count > model.end_pos)
+                    len = model.end_pos - model.begin_pos;
+                else
+                    len = list.Count - model.begin_pos;
+
+                var subList = list.GetRange(model.begin_pos, len);
+                return StatusCode(200, new { sto_list = subList, total = list.Count });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 return StatusCode(200, new { message = "in searchCommodity function error" });
+            }
+
+        }
+   
+        [HttpGet("categories")]
+        [Consumes("application/json")]
+        public IActionResult GetAllCategories()
+        {
+            var list = new List<string>();
+            try
+            {
+                list = DataBase.oracleCon.sqlSearchCategories();
+                return StatusCode(200, new { com_categories = list });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(200, new { message = "In GetAllCategories function error" });
             }
 
         }
@@ -62,17 +96,30 @@ namespace WebApplication3.Controllers
     //用于接收所商品搜索页面发送的数据：搜索字段和排序方法
     public class searchCommodityModel
     {
+        public int cus_id { get; set; } = 0;
         public string search_str { get; set; } = "-1";
         public int sort_order { get; set; } = 0;
+
+        public List<string> com_categories { get; set; }
+
+        public int begin_pos { get; set; } = 0;
+
+        public int end_pos { get; set; }= 0;
     }
     public class searchStoreModel
     {
         public string search_str { get; set; } = "-1";
+        public int sort_order { get; set; } = 0;
+
+        public List<string> com_categories { get; set; }
+
+        public int begin_pos { get; set; } = 0;
+
+        public int end_pos { get; set; } = 0;
+
     }
-
-
-    //用于发送一组商品信息，用于展示搜索结果
-    public class CommodityListModel
+        //用于发送一组商品信息，用于展示搜索结果
+        public class CommodityListModel
     {
 
         public int com_id { get; set; } = -1;
@@ -110,6 +157,8 @@ namespace WebApplication3.Controllers
 
         public string user_address { get; set; } = "-1";
         public string sto_firstImage { get; set; } = "-1";
+
+        public int indentNum = 0;
   
         public List<SubCommodityListModel> com_list{ get; set; } = new List<SubCommodityListModel>();
 

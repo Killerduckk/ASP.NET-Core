@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
+using System.Collections.Generic;
+using System;
 namespace WebApplication3.Controllers
 {
     [Route("api/[controller]")]
@@ -14,15 +15,66 @@ namespace WebApplication3.Controllers
         {
             try {
                 Console.WriteLine("Get into  GetCommodityDetail function");
-                return StatusCode(200, (DataBase.oracleCon.sqlSearchCommodityByID(com_id,12))); 
+                return StatusCode(200, (DataBase.oracleCon.sqlSearchCommodityByID(com_id, 12)));
             }
             catch (Exception ex) {
                 Console.WriteLine(ex);
-                return StatusCode(200, new {msg=ex}); 
+                return StatusCode(200, new { msg = ex });
             }
-            
+
+        }
+        [HttpPost("comment")]
+        [Consumes("application/json")]
+        public IActionResult PostComment([FromBody] CommentModel model)
+        {
+            DateTime currentTime = DateTime.Now;
+            var sql = $"Insert into WGY.COMMODITY_COMMENT(CMT_ID, CMT_FATHER, CMT_CONTENT, CMT_TIME, COM_ID, USER_ID) " +
+                $"values(COMMENT_ID_SEQ.NEXTVAL, {model.cmt_father}, '{model.cmt_content}',TO_DATE('{currentTime.ToString("yyyy-MM-dd HH:mm:ss")}','yyyy-MM-dd HH24:mi:ss'),{model.com_id}, {model.user_id})";
+            try
+            {
+                Console.WriteLine("Get into  PostComment function");
+                int result = DataBase.oracleCon.sqlInsertSingleItem(sql);
+                if (result == 1)
+                    return StatusCode(200, new { msg = "评论发布成功" });
+                else
+                    return StatusCode(200, new { msg = "上传失败" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(200, new { msg = "上传失败" });
+            }
+
+        }
+        [HttpPost("shoppingCart")]
+        [Consumes("application/json")]
+        public IActionResult ShoppingCart([FromBody] ShoppingCartModel model)
+        {
+            var list = new List<CommodityListModel>();
+            try
+            {
+                Console.WriteLine("Get into ShoppingCart function");
+                foreach (int com_id in model.com_id_arr)
+                {
+                    Console.WriteLine($"com_id:{com_id}");
+                    list.Add(DataBase.oracleCon.sqlSearchShoppingCart(com_id, model.cus_id));
+                }
+                return StatusCode(200, new { com_list = list });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(200, new { msg = "上传失败" });
+            }
+
         }
 
+        public class ShoppingCartModel{
+            public List<int> com_id_arr { get; set; } 
+
+            public int cus_id { get; set; }
+
+        }
 
         //返回商品的详情，用于展示商品详情
         public class CommodityDetailModel
@@ -50,10 +102,11 @@ namespace WebApplication3.Controllers
             public  double com_price { get; set; }
             public List<PriceCurveModel> com_prices { get; set; } = new List<PriceCurveModel>();
 
-            public List<string> comments { get; set; } =new List<string>();
+            public List<SendCommentModel> comments { get; set; }= new List<SendCommentModel>();
 
             public int favor_state { get; set; } = 0;
 
+           
             public bool MyIsNull() { return com_id == -1; }
         };
 
@@ -66,5 +119,35 @@ namespace WebApplication3.Controllers
         }
 
 
+        public class CommentModel
+        {
+
+            //public int cmt_id { get; set; }
+            public int user_id { get; set;}
+
+            public string cmt_content { get; set; }
+
+            public int cmt_father { get; set; }
+
+            public int com_id { get; set; }
+
+            //public string cmt_time { get; set; }
+        }
+        public class SendCommentModel
+        {
+
+            public int cmt_id { get; set; } = -1;
+
+            public int cmt_father { get; set; }
+            public string cmt_content { get; set; }
+            public string cmt_time { get; set; }
+            public string cmt_name { get; set; }
+            public int user_id { get; set; }
+
+            public int user_type { get; set; }
+            public int buying_times { get; set; } = 0;
+
+            public int com_id { get; set; }
+        }
     }
 }
