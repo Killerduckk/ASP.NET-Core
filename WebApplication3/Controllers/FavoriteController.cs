@@ -46,14 +46,14 @@ namespace WebApplication3.Controllers
 
         [HttpGet("getFavor")]
         [Consumes("application/json")]
-        public IActionResult GetFavorCommodity([FromQuery] StateModel model)
+        public IActionResult GetFavorCommodity([FromQuery] int cus_id)
         {
-            Console.WriteLine(model.cus_id);
+            Console.WriteLine(cus_id);
 
             try
             {
                 Console.WriteLine("Get intoGetFavorCommodity function");
-                List<CommodityListModel> list = DataBase.oracleCon.sqlSearchFavorCommodity(model.cus_id);
+                List<CommodityListModel> list = DataBase.oracleCon.sqlSearchFavorCommodity(cus_id);
 
                 return StatusCode(200, new { favor_list = list });
             }
@@ -77,14 +77,6 @@ namespace WebApplication3.Controllers
         public int cus_id { get; set; } = -1;
 
         public int favor_state { get; set; } = 0;
-    }
-    public class StateModel
-    {
-     
-
-        public int cus_id { get; set; } = -1;
-
-     
     }
 }
 

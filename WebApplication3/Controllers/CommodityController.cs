@@ -11,11 +11,11 @@ namespace WebApplication3.Controllers
         //返回商品的详细信息，用于展示商品详情
         [HttpGet("detail")]
         [Consumes("application/json")]
-        public IActionResult GetCommodityDetail(int com_id)
+        public IActionResult GetCommodityDetail(int com_id,int cus_id)
         {
             try {
                 Console.WriteLine("Get into  GetCommodityDetail function");
-                return StatusCode(200, (DataBase.oracleCon.sqlSearchCommodityByID(com_id, 12)));
+                return StatusCode(200, (DataBase.oracleCon.sqlSearchCommodityByID(com_id,cus_id)));
             }
             catch (Exception ex) {
                 Console.WriteLine(ex);

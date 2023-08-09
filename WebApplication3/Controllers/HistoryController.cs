@@ -62,11 +62,4 @@ namespace WebApplication3.Controllers
         public int whether_buy { get; set; }
 
     }
-
-    public class GetBrowsingHistoryModel
-    {
-
-        public int cus_id { get; set; }
-
-    }
 }
