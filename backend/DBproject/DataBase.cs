@@ -980,7 +980,7 @@ namespace DBproject
             }
             var searchSql =
                 $" SELECT " +
-                $" COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME" +
+                $" COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME,COM_STATUS" +
                 $" FROM COMMODITY" +
                 $" JOIN STORE ON COMMODITY.STO_ID=STORE.STO_ID" +
                 $" WHERE COM_NAME LIKE '%{model.search_str}%' ";
@@ -1029,7 +1029,7 @@ namespace DBproject
                         searchModel.com_rating = reader.GetDouble(7);
                         searchModel.sto_id = reader.GetDouble(8);
                         searchModel.sto_name = reader.GetString(9);
-
+                        searchModel.com_status=reader.GetInt32(10);
                         //搜索某个商品的商品类别
                         using (var cmdFitCategory = con.CreateCommand())
                         {
@@ -1106,7 +1106,7 @@ namespace DBproject
             var list = new List<CommodityListModel>();
             var searchSql =
                 $"SELECT " +
-                $" FAVORITE.COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME" +
+                $" FAVORITE.COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME,COM_STATUS" +
                 $" FROM COMMODITY,STORE,FAVORITE" +
                 $" WHERE FAVORITE.CUS_ID ={cus_id} AND FAVORITE.COM_ID= COMMODITY.COM_ID AND COMMODITY.STO_ID=STORE.STO_ID" +
                 $" ORDER BY COM_RATING DESC";
@@ -1132,7 +1132,7 @@ namespace DBproject
                         searchModel.sto_id = reader.GetDouble(8);
                         searchModel.sto_name = reader.GetString(9);
                         searchModel.favor_state = 1;
-
+                        searchModel.com_status = reader.GetInt32(10);
                         //搜索某个商品的商品类别
                         using (var cmdFitCategory = con.CreateCommand())
                         {
@@ -1188,7 +1188,7 @@ namespace DBproject
             var list = new List<CommodityListModel>();
             var searchSql =
                 $" SELECT " +
-                $" BROWSE.COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME" +
+                $" BROWSE.COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME,COM_STATUS" +
                 $" FROM COMMODITY,STORE,BROWSE" +
                 $" WHERE BROWSE.BROWSER_ID ={cus_id} AND BROWSE.COM_ID= COMMODITY.COM_ID AND COMMODITY.STO_ID=STORE.STO_ID" +
                 $" ORDER BY BRO_TIME_END DESC";
@@ -1214,7 +1214,7 @@ namespace DBproject
                         searchModel.sto_id = reader.GetDouble(8);
                         searchModel.sto_name = reader.GetString(9);
                         searchModel.favor_state = 1;
-
+                        searchModel.com_status = reader.GetInt32(10);
                         //搜索某个商品的商品类别
                         using (var cmdFitCategory = con.CreateCommand())
                         {
@@ -1286,7 +1286,7 @@ namespace DBproject
             DateTime date = DateTime.Now;
             var searchSql =
                 $"SELECT " +
-                $" COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME" +
+                $" COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME,COM_STATUS" +
                 $" FROM COMMODITY, STORE" +
                 $" WHERE COM_ID ={com_id} AND COMMODITY.STO_ID=STORE.STO_ID";
             Console.WriteLine("In searchCommodityByName function going to execute: " + searchSql + "\n");
@@ -1310,6 +1310,7 @@ namespace DBproject
                         searchModel.com_rating = reader.GetDouble(7);
                         searchModel.sto_id = reader.GetDouble(8);
                         searchModel.sto_name = reader.GetString(9);
+                        searchModel.com_status = reader.GetInt32(10);
                         using (var cmdFitCategory = con.CreateCommand())
                         {
                             var fitCategorySql = $"SELECT COM_CATEGORY FROM COMMODITY_CATEGORIES WHERE COM_ID = {searchModel.com_id}";
@@ -1341,7 +1342,7 @@ namespace DBproject
                         using (var cmdFitPrice = con.CreateCommand())
                         {
 
-                            var fitPriceSql = $"SELECT * FROM COMMODITY_PRICE_CURVE WHERE COM_ID ={searchModel.com_id} ORDER BY COM_PC_TIME ASC";
+                            var fitPriceSql = $"SELECT COM_PC_TIME,COM_PC_PRICE FROM COMMODITY_PRICE_CURVE WHERE COM_ID ={searchModel.com_id} ORDER BY COM_PC_TIME ASC";
                             cmdFitPrice.CommandText = fitPriceSql;
                             Console.WriteLine("In searchCommodityByName function going to execute: " + fitPriceSql);
                             OracleDataReader readerFitPrice = cmdFitPrice.ExecuteReader();
@@ -1353,18 +1354,25 @@ namespace DBproject
 
                             var exPriceNode = new PriceCurveModel();
                             exPriceNode.com_pc_price = 0;
-                            exPriceNode.com_pc_time = searchModel.com_expirationDate;
+                            exPriceNode.com_pc_time = DateTime.Parse(searchModel.com_expirationDate).AddDays(1).ToString("yyyy-MM-dd");
+                            searchModel.com_prices.Add(uploadPriceNode);
+                            searchModel.com_prices.Add(exPriceNode);
                             while (readerFitPrice.Read())
                             {
                                 var singlePriceNode = new PriceCurveModel();
-                                double temp = (int)(readerFitPrice.GetDouble(1) * searchModel.com_oriPrice * 100);
-                                singlePriceNode.com_pc_price = temp / 100;
+                                //double temp = (int)(readerFitPrice.GetDouble(1) * searchModel.com_oriPrice * 100);
+                                singlePriceNode.com_pc_price = readerFitPrice.GetDouble(1);
+
                                 singlePriceNode.com_pc_time = readerFitPrice.GetDateTime(0).ToString("yyyy-MM-dd");
                                 searchModel.com_prices.Add(singlePriceNode);
-                            }
-                            searchModel.com_prices.Add(uploadPriceNode);
-                            searchModel.com_prices.Add(exPriceNode);
+                            }                       
                             searchModel.com_prices.Sort((x, y) => y.com_pc_price.CompareTo(x.com_pc_price));
+                            //价格一定一个比一个低
+                            //节点不能重复
+                            if (searchModel.com_prices[0].com_pc_time== searchModel.com_prices[1].com_pc_time)
+                            {
+                                searchModel.com_prices.RemoveAt(0);
+                            }
                             searchModel.com_price = sqlGetCommodityCurrPrice(searchModel.com_id);
                             readerFitPrice.Dispose();
                             Console.WriteLine("finish fitPriceSql\n");
@@ -1497,7 +1505,7 @@ namespace DBproject
             DateTime date = DateTime.Now;
             var searchSql =
                 $"SELECT " +
-                $" COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME" +
+                $" COM_ID,COM_NAME,COM_INTRODUCTION,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE,COM_LEFT,COM_RATING,COMMODITY.STO_ID,STORE.STO_NAME,COM_STATUS" +
                 $" FROM COMMODITY, STORE" +
                 $" WHERE COM_ID ={com_id} AND COMMODITY.STO_ID=STORE.STO_ID";
             Console.WriteLine("In searchCommodityByName function going to execute: " + searchSql + "\n");
@@ -1521,6 +1529,7 @@ namespace DBproject
                         searchModel.com_rating = reader.GetDouble(7);
                         searchModel.sto_id = reader.GetDouble(8);
                         searchModel.sto_name = reader.GetString(9);
+                        searchModel.com_status = reader.GetInt32(10);
                         using (var cmdFitCategory = con.CreateCommand())
                         {
                             var fitCategorySql = $"SELECT COM_CATEGORY FROM COMMODITY_CATEGORIES WHERE COM_ID = {searchModel.com_id}";
@@ -1669,7 +1678,7 @@ namespace DBproject
                         }
                         using (var cmdFitCom = con.CreateCommand())
                         {
-                            var fitComSql = $"SELECT COM_ID,COM_NAME,COM_EXPIRATIONDATE FROM COMMODITY WHERE STO_ID ={searchModel.sto_id} ORDER BY COM_RATING";
+                            var fitComSql = $"SELECT COM_ID,COM_NAME,COM_EXPIRATIONDATE ,COM_STATUS FROM COMMODITY WHERE STO_ID ={searchModel.sto_id} ORDER BY COM_RATING";
                             cmdFitCom.CommandText = fitComSql;
                             Console.WriteLine("In 'searchStoreByName' function going to execute: " + fitComSql);
                             OracleDataReader readerFitCom = cmdFitCom.ExecuteReader();
@@ -1681,6 +1690,7 @@ namespace DBproject
                                 subCom.com_id = readerFitCom.GetInt32(0); ;
                                 subCom.com_name = readerFitCom.GetString(1);
                                 subCom.com_expirationDate = readerFitCom.GetDateTime(2).ToString("yyyy-MM-dd");
+                                subCom.com_status = readerFitCom.GetInt32(3);
                                 int my_com_id = readerFitCom.GetInt32(0); ;
                                 subCom.com_price = sqlGetCommodityCurrPrice(subCom.com_id);
                                 using (var cmdFitFirImage = con.CreateCommand())
@@ -1820,7 +1830,7 @@ namespace DBproject
                         }
                         using (var cmdFitCom = con.CreateCommand())
                         {
-                            var fitComSql = $"SELECT COM_ID,COM_NAME,COM_EXPIRATIONDATE FROM COMMODITY WHERE STO_ID ={searchModel.sto_id} ORDER BY COM_RATING";
+                            var fitComSql = $"SELECT COM_ID,COM_NAME,COM_EXPIRATIONDATE ,COM_STATUS FROM COMMODITY WHERE STO_ID ={searchModel.sto_id} ORDER BY COM_RATING";
                             cmdFitCom.CommandText = fitComSql;
                             Console.WriteLine("In searchCommodityByName function going to execute: " + fitComSql);
                             OracleDataReader readerFitCom = cmdFitCom.ExecuteReader();
@@ -1830,6 +1840,7 @@ namespace DBproject
                                 subCom.com_id = readerFitCom.GetInt32(0);
                                 subCom.com_name = readerFitCom.GetString(1);
                                 subCom.com_expirationDate = readerFitCom.GetDateTime(2).ToString("yyyy-MM-dd");
+                                subCom.com_status = readerFitCom.GetInt32(3);
                                 int my_com_id = readerFitCom.GetInt32(0); ;
                                 subCom.com_price = sqlGetCommodityCurrPrice(subCom.com_id);
 
@@ -1914,7 +1925,7 @@ namespace DBproject
             DateTime date = DateTime.Now;
             var searchSql =
                 $" SELECT " +
-                $" COM_ID,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE" +
+                $" COM_ID,COM_ORIPRICE,COM_EXPIRATIONDATE,COM_UPLOADDATE " +
                 $" FROM COMMODITY" +
                 $" WHERE COM_ID ={com_id}";
             double com_price = 0;
@@ -1944,11 +1955,11 @@ namespace DBproject
                     uploadPriceNode.com_pc_price = com_oriPrice;
                     uploadPriceNode.com_pc_time = com_uploadDate;
                     exPriceNode.com_pc_price = 0;
-                    exPriceNode.com_pc_time = com_expirationDate;
+                    exPriceNode.com_pc_time = DateTime.Parse(com_expirationDate).AddDays(1).ToString("yyyy-MM-dd");
                     while (readerFitPrice.Read())
                     {
                         var singlePriceNode = new PriceCurveModel();
-                        singlePriceNode.com_pc_price = readerFitPrice.GetDouble(1) * com_oriPrice;
+                        singlePriceNode.com_pc_price = readerFitPrice.GetDouble(1);
                         singlePriceNode.com_pc_time = readerFitPrice.GetDateTime(0).ToString("yyyy-MM-dd");
                         com_prices.Add(singlePriceNode);
                     }
@@ -1956,6 +1967,10 @@ namespace DBproject
                     com_prices.Add(exPriceNode);
                     com_prices.Sort((x, y) => y.com_pc_price.CompareTo(x.com_pc_price));
 
+                    if (com_prices[0].com_pc_time == com_prices[1].com_pc_time)
+                    {
+                        com_prices.RemoveAt(0);
+                    }
 
                     foreach (var priceNode in com_prices)
                     {
@@ -1970,9 +1985,8 @@ namespace DBproject
 
                 }
             }
-            int temp = (int)(com_price * 100);
-            com_price = temp;
-            com_price /= 100;
+          
+         
             return com_price;
         }
     }

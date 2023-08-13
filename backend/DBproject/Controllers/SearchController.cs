@@ -140,6 +140,8 @@ namespace WebApplication3.Controllers
 
         public int favor_state { get; set; } = 0;
 
+
+        public int com_status { get; set; } = 1;//-1是过期，0是售罄，1是在售
         public bool MyIsNull() { return com_id == -1; }
     };
 
@@ -180,6 +182,7 @@ namespace WebApplication3.Controllers
         public string com_firstImage { get; set; } = "-1";
         public double com_price { get; set; } = -1;
 
+        public int com_status { get; set; } = 1;//-1是过期，0是售罄，1是在售
         public int favor_state { get; set; } = -1;
 
     };

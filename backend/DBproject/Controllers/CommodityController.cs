@@ -109,6 +109,7 @@ namespace WebApplication3.Controllers
 
            
             public bool MyIsNull() { return com_id == -1; }
+            public int com_status { get; set; } = 1;//-1是过期，0是售罄，1是在售
         };
 
         public class PriceCurveModel
@@ -132,7 +133,7 @@ namespace WebApplication3.Controllers
 
             public int com_id { get; set; }
 
-            //public string cmt_time { get; set; }
+ 
         }
         public class SendCommentModel
         {
