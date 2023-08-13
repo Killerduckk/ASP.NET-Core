@@ -1,0 +1,73 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_image\\262\\com_image_0.jpg",
+      "PackagePath": "staticwebassets\\commodity_image\\262\\com_image_0.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_image\\263\\com_image_0.jpg",
+      "PackagePath": "staticwebassets\\commodity_image\\263\\com_image_0.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_image\\263\\com_image_1.jpg",
+      "PackagePath": "staticwebassets\\commodity_image\\263\\com_image_1.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_image\\265\\com_image_0.jpg",
+      "PackagePath": "staticwebassets\\commodity_image\\265\\com_image_0.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_image\\282\\com_image_0.jpg",
+      "PackagePath": "staticwebassets\\commodity_image\\282\\com_image_0.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_image\\283\\com_image_0.jpg",
+      "PackagePath": "staticwebassets\\commodity_image\\283\\com_image_0.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_tmp\\124\\com_image_0.jpg",
+      "PackagePath": "staticwebassets\\commodity_tmp\\124\\com_image_0.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_tmp\\125\\com_image_0.jpg",
+      "PackagePath": "staticwebassets\\commodity_tmp\\125\\com_image_0.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_tmp\\87\\com_image_0.jpg",
+      "PackagePath": "staticwebassets\\commodity_tmp\\87\\com_image_0.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_tmp\\88\\com_image_0.jpg",
+      "PackagePath": "staticwebassets\\commodity_tmp\\88\\com_image_0.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\commodity_tmp\\96\\com_image_0.jpg",
+      "PackagePath": "staticwebassets\\commodity_tmp\\96\\com_image_0.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\licenses\\1000001_license.jpg",
+      "PackagePath": "staticwebassets\\licenses\\1000001_license.jpg"
+    },
+    {
+      "Id": "D:\\桌面\\database_update\\DBproject\\DBproject\\wwwroot\\licenses\\1000002_license.jpg",
+      "PackagePath": "staticwebassets\\licenses\\1000002_license.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.DBproject.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.build.DBproject.props",
+      "PackagePath": "build\\DBproject.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildMultiTargeting.DBproject.props",
+      "PackagePath": "buildMultiTargeting\\DBproject.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildTransitive.DBproject.props",
+      "PackagePath": "buildTransitive\\DBproject.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

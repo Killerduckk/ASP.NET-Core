@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\临期食品.props" />
-</Project>
